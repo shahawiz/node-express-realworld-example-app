@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:3.4.9
+    restart: always
+    volumes:
+      - app-dbdata:/data/db
+    networks:
+      - apptest-net
+  app:
+    depends_on:
+      - mongodb
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    restart: always
+    ports:
+      - 9999:3000
+    env_file: ./.env
+    stdin_open: true
+    tty: true
+    networks:
+      - apptest-net
+volumes:
+  app-dbdata:
+
+networks:
+  apptest-net:
+    driver: bridge
