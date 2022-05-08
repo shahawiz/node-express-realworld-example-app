@@ -14,6 +14,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
+    container_name: ${containerName:-testapp}
     restart: always
     ports:
       - 9999:3000
