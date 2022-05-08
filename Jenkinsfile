@@ -3,9 +3,9 @@ pipeline {
   environment {
     IMAGE_NAME = "eks-test"
     AWS_REGION  = 'eu-west-2'
-    AWS_ACCOUNT_ID = '720913955512'
+    AWS_ACCOUNT_ID = '075147247008'
     ECR_REPO_NAME = 'eks-test'
-    REPO_URI = '720913955512.dkr.ecr.us-west-2.amazonaws.com/eks-test'
+    REPO_URI = '075147247008.dkr.ecr.us-west-2.amazonaws.com/eks-test'
   } 
 
     agent any
@@ -44,6 +44,7 @@ pipeline {
                   sh """
                   aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                   docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:latest
+                  docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:${BUILD_NUMBER}
                   docker push ${REPO_URI}:latest
                   docker push ${REPO_URI}:${BUILD_NUMBER}
                   """
@@ -52,12 +53,12 @@ pipeline {
              }
          }
         
-    stage('Clean Unused image - Master') {
+    stage('Clean Images & Volumes') {
 
       steps{
         //Delete Images on machine
-        sh "docker rmi $IMAGE_NAME:$BUILD_NUMBER"
-        sh "docker rmi $IMAGE_NAME:latest"
+        sh "docker rmi ${REPO_URI}:$BUILD_NUMBER"
+        sh "docker rmi ${REPO_URI}:latest"
         //Delete unused Volumes
         sh "docker volume prune -f"
       }
