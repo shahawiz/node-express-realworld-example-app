@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nodetestapp
+  namespace: nodetestapp
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nodetestapp.hossamelshahawi.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: nodetestapp
+            port:
+              number: 80

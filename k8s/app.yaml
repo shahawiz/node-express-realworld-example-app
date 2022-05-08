@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodetestapp
+  namespace: nodetestapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodetestapp
+  template:
+    metadata:
+      labels:
+        app: nodetestapp
+    spec:
+      containers:
+        - name: nodetestapp
+          image: 720913955512.dkr.ecr.us-west-2.amazonaws.com/eks-test:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: mongodb://mongo:27017/prod
+            - name: NODE_ENV
+              value: production
+            - name: SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nodetestapp-secret    
+                  key: secret        
+
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nodetestapp-secret
+  namespace: nodetestapp
+data:
+  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodetestapp
+spec:
+  selector:
+    app: nodetestapp
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: nodetestapp
