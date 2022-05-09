@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: nodetestapp
-          image: 720913955512.dkr.ecr.us-west-2.amazonaws.com/eks-test:latest
+          image: public.ecr.aws/l1i3r8d0/nodetestapp:latest
           ports:
             - containerPort: 3000
           env:

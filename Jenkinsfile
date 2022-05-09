@@ -1,11 +1,11 @@
 pipeline {
 
   environment {
-    IMAGE_NAME = "eks-test"
+    IMAGE_NAME = "nodetestapp"
     AWS_REGION  = 'eu-west-2'
     AWS_ACCOUNT_ID = '075147247008'
-    ECR_REPO_NAME = 'eks-test'
-    REPO_URI = '075147247008.dkr.ecr.us-west-2.amazonaws.com/eks-test'
+    ECR_REPO_NAME = 'nodetestapp'
+    REPO_URI = 'public.ecr.aws/l1i3r8d0/nodetestapp'
   } 
 
     agent any
@@ -42,7 +42,11 @@ pipeline {
 
                script {
                   sh """
-                  aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                  #For Private ECR Repo
+                  #aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                  #For Public ECR Repo
+                  aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws/l1i3r8d0
+                  
                   docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:latest
                   docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:${BUILD_NUMBER}
                   docker push ${REPO_URI}:latest
