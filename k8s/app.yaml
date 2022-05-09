@@ -37,7 +37,7 @@ metadata:
   name: nodetestapp-secret
   namespace: nodetestapp
 data:
-  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767"
+  secret: "dGhpc2lzbXlzZWNyY3Rla2V5ZmhyZ2ZncmZydHk4NGZ3aXI3NjcK"
 ---
 apiVersion: v1
 kind: Service
