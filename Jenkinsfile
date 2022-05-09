@@ -44,8 +44,9 @@ pipeline {
                   sh """
                   #For Private ECR Repo
                   #aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                  #For Public ECR Repo
-                  aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws/l1i3r8d0
+                  
+                  #For Public ECR Repo Note: GetAuthorizationToken command is only supported in us-east-1.
+                  aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/l1i3r8d0
                   
                   docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:latest
                   docker tag ${ECR_REPO_NAME}:latest ${REPO_URI}:${BUILD_NUMBER}
