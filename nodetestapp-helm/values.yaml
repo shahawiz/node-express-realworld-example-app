@@ -70,3 +70,4 @@ affinity: {}
 env: production
 namespace: nodetestapp
 secret: "dGhpc2lzbXlzZWNyY3Rla2V5ZmhyZ2ZncmZydHk4NGZ3aXI3NjcK"
+domain_name: nodetestapp.hossamelshahawi.com
