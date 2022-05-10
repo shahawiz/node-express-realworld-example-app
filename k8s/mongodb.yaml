@@ -41,6 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongo
+  namespace: nodetestapp
 spec:
   selector:
     app: mongo
