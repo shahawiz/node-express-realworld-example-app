@@ -5,53 +5,40 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  pullPolicy: IfNotPresent
+  repository: public.ecr.aws/l1i3r8d0/nodetestapp:latest
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+  tag: "latest"
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  create: false
 
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
   port: 80
+  target: 3000
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
+  enabled: true
+  annotations: 
+     kubernetes.io/ingress.class: nginx
+     nginx.ingress.kubernetes.io/rewrite-target: /$2
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+    - host: nodetestapp.hossamelshahawi.com
+      http:
+        paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: nodetestapp
+              port:
+                number: 80
+
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -80,3 +67,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+env: production
+namespace: nodetestapp
+secret: "dGhpc2lzbXlzZWNyY3Rla2V5ZmhyZ2ZncmZydHk4NGZ3aXI3NjcK"
