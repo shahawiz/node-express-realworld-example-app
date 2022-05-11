@@ -1,8 +1,8 @@
+{{- $fullName := include "nodetestapp-helm.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nodetestapp
-  namespace: nodetestapp
+  name: {{ .Release.Name }}
 spec:
   ingressClassName: nginx
   rules:
@@ -13,6 +13,6 @@ spec:
         path: /
         backend:
           service:
-            name: nodetestapp
+            name: {{ $fullName }}
             port:
               number: 80

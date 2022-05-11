@@ -39,17 +39,12 @@ spec:
               protocol: TCP
           env:
             - name: MONGODB_URI
-              value: mongodb://mongo:27017/prod
+              value: mongodb://{{ .Release.Name }}-mongodb:27017/prod
             - name: SECRET
               valueFrom:
                 secretKeyRef:
-                  name: nodetestapp-secret    
+                  name: {{ .Release.Name }}-secrets    
                   key: secret
             - name: NODE_ENV
               value: {{ .Values.env }}
 
----
-apiVersion: v1
-kind: Namespace
-metadata:
-    name: {{ .Values.namespace }}
