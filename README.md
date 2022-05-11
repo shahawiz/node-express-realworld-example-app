@@ -1,52 +1,88 @@
-# ![Node/Express/Mongoose Example App](project-logo.png)
+# NodeJs App + MongoDB
 
-[![Build Status](https://travis-ci.org/anishkny/node-express-realworld-example-app.svg?branch=master)](https://travis-ci.org/anishkny/node-express-realworld-example-app)
+This repo contains a simple NodeJs app with MongoDB and includes :
+- Dockerfile -> Dockerfile
+- Docker Compose -> docker-compose.yml
+- Jenkins pipeline -> Jenkinsfile
+- Kubernates -> k8s
+- HelmChart -> nodetestapp-helm
+- Simple Terraform IaaC template to provision an EC2 with attached EBS - > terraform
 
-> ### Example Node (Express + Mongoose) codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) API spec.
+## Docker & Docker Compose Usage
+The NodeJs app requires some parameters like a secret to be used in sessions so, these params were added to .env.example and before you run the docker compose you have to change the file name to **.env**
+```python
 
-<a href="https://thinkster.io/tutorials/node-json-api" target="_blank"><img width="454" src="https://raw.githubusercontent.com/gothinkster/realworld/master/media/learn-btn-hr.png" /></a>
+# Change env file name
+mv .env.example
 
-This repo is functionality complete — PRs and issues welcome!
+# Run Docker-Compose
+docker-compose up --build --build-arg containerName="nodetestapp" -d
 
-# Getting started
+```
 
-To get the Node server running locally:
+## Jenkins pipeline Usage
+This pipeline has the following stages :
+- Clone code from the current repo.
+- Build docker image.
+- Test Application by running docker-compose then execute **npm run test**
+- Deploying to AWS ECR :
+   - I deployed to public ECR to make it easy to access the repo to test it by anybody but it's not the best practice as you have to deploy it to private ECR.
+   - I didn't use AWS Key/Secret but I created and [attached IAM Role to the Jenkins instance](https://aws.amazon.com/premiumsupport/knowledge-center/assign-iam-role-ec2-instance/).
+   - **Note :** To push to public ECR the only supported region to authenticate and get AWS token is *us-east-1* 
+![Alt text](https://i.ibb.co/qWrBzLs/EKS-TEST-Jenkins.png "Jenkins")
 
-- Clone this repo
-- `npm install` to install all required dependencies
-- Install MongoDB Community Edition ([instructions](https://docs.mongodb.com/manual/installation/#tutorials)) and run it by executing `mongod`
-- `npm run dev` to start the local server
+When you open Jenkinsfile you have to edit the env section with following 
+```python
+  environment {
+    IMAGE_NAME = "nodetestapp"  //Your Image name
+    AWS_REGION  = 'eu-west-2' // Change it to region of private ECR
+    AWS_ACCOUNT_ID = '075147275408' //Your AWS account ID needed if you will use a private ECR
+    ECR_REPO_NAME = 'nodetestapp' //ECR Repo name
+    REPO_URI = 'public.ecr.aws/l1i3r8d0/nodetestapp' //ECR URI
+  } 
 
-Alternately, to quickly try out this repo in the cloud, you can [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/realworld)
+```
+Also, if there are two lines if you are using public or private ECR in the deploy to ECR stage
 
-# Code Overview
+```python
+#For Private ECR Repo
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                  
+#For Public ECR Repo Note: GetAuthorizationToken command is only supported in us-east-1.
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/l1i3r8d0
+```
+## Kubernetes Usage
+```python
+#You can easily deploy the stack in Kubernetes by the following :
+$ kubectl apply -f k8s/
 
-## Dependencies
+#To get the running pods
+$ kubectl get pods --watch -n nodetestapp
 
-- [expressjs](https://github.com/expressjs/express) - The server for handling and routing HTTP requests
-- [express-jwt](https://github.com/auth0/express-jwt) - Middleware for validating JWTs for authentication
-- [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) - For generating JWTs used by authentication
-- [mongoose](https://github.com/Automattic/mongoose) - For modeling and mapping MongoDB data to javascript 
-- [mongoose-unique-validator](https://github.com/blakehaswell/mongoose-unique-validator) - For handling unique validation errors in Mongoose. Mongoose only handles validation at the document level, so a unique index across a collection will throw an exception at the driver level. The `mongoose-unique-validator` plugin helps us by formatting the error like a normal mongoose `ValidationError`.
-- [passport](https://github.com/jaredhanson/passport) - For handling user authentication
-- [slug](https://github.com/dodo/node-slug) - For encoding titles into a URL-friendly format
+NAME               READY   STATUS    RESTARTS   AGE
+mongodb            1/1     Running   0          48m
+nodetestapp        1/1     Running   0          48m
+```
 
-## Application Structure
+## Helm Usage
+[How to Install Helm](https://helm.sh/docs/intro/install/)
+```python
+#You can easily deploy Helm Chart the following :
+$ helm install demochart nodetestapp-helm
 
-- `app.js` - The entry point to our application. This file defines our express server and connects it to MongoDB using mongoose. It also requires the routes and models we'll be using in the application.
-- `config/` - This folder contains configuration for passport as well as a central location for configuration/environment variables.
-- `routes/` - This folder contains the route definitions for our API.
-- `models/` - This folder contains the schema definitions for our Mongoose models.
+```
+## Terraform Usage
+[How to Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+```python
+#You can easily deploy EC2 with EBS by the following :
+$ cd terraform 
 
-## Error Handling
+$ terraform init
+$ terraform plan
+$ terraform apply
 
-In `routes/api/index.js`, we define a error-handling middleware for handling Mongoose's `ValidationError`. This middleware will respond with a 422 status code and format the response to have [error messages the clients can understand](https://github.com/gothinkster/realworld/blob/master/API.md#errors-and-status-codes)
+#To Delete the Stack
+$ terraform destroy
 
-## Authentication
-
-Requests are authenticated using the `Authorization` header with a valid JWT. We define two express middlewares in `routes/auth.js` that can be used to authenticate requests. The `required` middleware configures the `express-jwt` middleware using our application's secret and will return a 401 status code if the request cannot be authenticated. The payload of the JWT can then be accessed from `req.payload` in the endpoint. The `optional` middleware configures the `express-jwt` in the same way as `required`, but will *not* return a 401 status code if the request cannot be authenticated.
-
-
-<br />
-
-[![Brought to you by Thinkster](https://raw.githubusercontent.com/gothinkster/realworld/master/media/end.png)](https://thinkster.io)
+```
+**NOTE** : I didn't use AWS Key/Secret as the machine used to run terraform has an attached IAM role to provide the resources, but in case you are running from a machine outside AWS you can have Key/Secret in provider.tf, and also consider using Vault. 
