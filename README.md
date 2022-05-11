@@ -8,6 +8,11 @@ This repo contains a simple NodeJs app with MongoDB and includes :
 - HelmChart -> nodetestapp-helm
 - Simple Terraform IaaC template to provision an EC2 with attached EBS - > terraform
 
+## Demo
+This app was deployed on Kubernates cluster and can be access through this link :
+
+https://nodetestapp.hossamelshahawi.com
+
 ## Docker & Docker Compose Usage
 The NodeJs app requires some parameters like a secret to be used in sessions so, these params were added to .env.example and before you run the docker compose you have to change the file name to **.env**
 ```python
