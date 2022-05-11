@@ -51,7 +51,7 @@ aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS 
 #For Public ECR Repo Note: GetAuthorizationToken command is only supported in us-east-1.
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/l1i3r8d0
 ```
-![Alt text](https://i.ibb.co/vzjP61f/Quick-start-Publishing-to-Amazon-ECR-Public-using-the-AWS-CLI-Amazon-ECR-Public.png "AWS warning")
+![Alt text](https://i.ibb.co/BcqSW44/Quick-start-Publishing-to-Amazon-ECR-Public-using-the-AWS-CLI-Amazon-ECR-Public-1.png "AWS warning")
 
 ## Kubernetes Usage
 ```python
