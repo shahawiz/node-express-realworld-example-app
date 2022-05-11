@@ -9,7 +9,7 @@ This repo contains a simple NodeJs app with MongoDB and includes :
 - Simple Terraform IaaC template to provision an EC2 with attached EBS - > terraform
 
 ## Demo
-This app was deployed on Kubernates cluster and can be access through this link :
+This app was deployed on Kubernates cluster and can be accessed through this link :
 
 https://nodetestapp.hossamelshahawi.com
 
